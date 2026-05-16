@@ -1,0 +1,47 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "emmet.includeLanguages": { "javascript": "javascriptreact" },
+    "files.associations": { "*.jsx": "javascriptreact" },
+    "css.validate": false,
+    "editor.quickSuggestions": { "strings": true },
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": true,
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "workbench.colorTheme": "One Dark Pro"
+  },
+  "extensions": {
+    "recommendations": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "dsznajder.es7-react-js-snippets",
+      "bradlc.vscode-tailwindcss",
+      "formulahendry.auto-close-tag",
+      "formulahendry.auto-rename-tag",
+      "streetsidesoftware.code-spell-checker",
+      "zhuangtongfa.material-theme",
+      "PKief.material-icon-theme",
+      "christian-kohler.path-intellisense",
+      "ms-vscode.vscode-json"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "chrome",
+        "request": "launch",
+        "name": "Launch StudyStreak in Chrome",
+        "url": "http://localhost:5173",
+        "webRoot": "${workspaceFolder}/src"
+      }
+    ]
+  }
+}

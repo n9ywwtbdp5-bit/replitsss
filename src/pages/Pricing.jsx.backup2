@@ -1,0 +1,545 @@
+import React, { useEffect, useState } from 'react'
+import { useStore } from '../store.js'
+import { startStripeCheckout } from '../lib/stripeCheckout.js'
+
+const PLANS = [
+  {
+    id: 'free',
+    name: 'Free',
+    emoji: '🌱',
+    price: 0,
+    period: 'forever',
+    tagline: 'Get started and build your first habit',
+    color: '#6B6B8A',
+    shadow: '#A9A9C0',
+    features: [
+      '✅ 1 active subject',
+      '✅ Basic streak tracking',
+      '✅ Pomodoro timer',
+      '✅ 7-day history',
+      '✅ 3 achievements',
+      '❌ Advanced analytics',
+      '❌ All subjects unlocked',
+      '❌ Streak freeze shields',
+      '❌ AI study planner',
+      '❌ Leaderboards',
+    ],
+    cta: 'Current Plan',
+    highlight: false,
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    emoji: '⚡',
+    price: 16.99,
+    period: 'per month',
+    tagline: 'For students serious about building habits',
+    color: '#FF6B35',
+    shadow: '#C94E1F',
+    badge: '🏆 Most Popular',
+    features: [
+      '✅ All 6 subjects unlocked',
+      '✅ Advanced streak analytics',
+      '✅ Full progress charts',
+      '✅ 90-day history',
+      '✅ All 50+ achievements',
+      '✅ 3 streak freeze shields/month',
+      '✅ Custom timer modes',
+      '✅ Weekly email reports',
+      '❌ AI study planner',
+      '❌ Priority support',
+    ],
+    cta: 'Start Pro — $16.99/mo',
+    highlight: true,
+  },
+  {
+    id: 'premium',
+    name: 'Premium',
+    emoji: '👑',
+    price: 23.99,
+    period: 'per month',
+    tagline: 'The full arsenal for top performers',
+    color: '#9B5DE5',
+    shadow: '#7B3DB5',
+    features: [
+      '✅ Everything in Pro',
+      '✅ AI-powered study planner',
+      '✅ Unlimited streak shields',
+      '✅ Leaderboard access',
+      '✅ 1-year history & exports',
+      '✅ Study group challenges',
+      '✅ Priority support (24hr)',
+      '✅ Early feature access',
+      '✅ Custom avatar & themes',
+      '✅ Monthly 1-on-1 coaching call',
+    ],
+    cta: 'Go Premium — $23.99/mo',
+    highlight: false,
+  },
+]
+
+const FAQ = [
+  {
+    q: 'Can I cancel anytime?',
+    a: 'Absolutely. Cancel anytime with no hidden fees.',
+  },
+  {
+    q: 'Is there a free trial?',
+    a: 'Yes! Pro and Premium include a 7-day free trial.',
+  },
+  {
+    q: 'What happens if I cancel?',
+    a: 'Your progress and streaks remain saved forever.',
+  },
+  {
+    q: 'Do you offer student discounts?',
+    a: 'Yes! Contact support with your .edu email.',
+  },
+]
+
+export default function Pricing() {
+  const { user } = useStore()
+
+  const [billing, setBilling] = useState('monthly')
+  const [activeFaq, setActiveFaq] = useState(null)
+  const [checkoutPlan, setCheckoutPlan] = useState('')
+
+  useEffect(() => {
+    const billingFromUrl = new URLSearchParams(window.location.search).get('billing')
+    if (billingFromUrl === 'monthly' || billingFromUrl === 'annual') {
+      setBilling(billingFromUrl)
+    }
+  }, [])
+
+  const handleSelect = async (plan) => {
+    if (plan === 'free') return
+
+    setCheckoutPlan(plan)
+
+    const result = await startStripeCheckout({ plan, billing })
+
+    if (!result.ok) {
+      alert(result.message)
+      setCheckoutPlan('')
+    }
+  }
+
+  return (
+    <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
+      <section className="section">
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: 48,
+          }}
+        >
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 8,
+              background: 'var(--bg-tertiary)',
+              borderRadius: '50px',
+              padding: '6px 18px',
+              fontWeight: 800,
+              fontSize: '0.85rem',
+              color: 'var(--brand-primary)',
+              marginBottom: 16,
+            }}
+          >
+            💳 Simple, honest pricing
+          </div>
+
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.5rem, 6vw, 3.5rem)',
+              marginBottom: 16,
+              textAlign: 'center',
+              lineHeight: 1.2,
+            }}
+          >
+            Invest in Your{' '}
+            <span style={{ color: 'var(--brand-primary)' }}>
+              Future Self 🚀
+            </span>
+          </h1>
+
+          <p
+            style={{
+              color: 'var(--text-secondary)',
+              fontSize: '1.15rem',
+              fontWeight: 600,
+              maxWidth: 560,
+              margin: '0 auto 28px',
+              lineHeight: 1.7,
+            }}
+          >
+            Start free. Upgrade when you're ready.
+          </p>
+
+          <div
+            style={{
+              display: 'inline-flex',
+              background: 'var(--bg-tertiary)',
+              borderRadius: '50px',
+              padding: 4,
+            }}
+          >
+            {['monthly', 'annual'].map((b) => (
+              <button
+                key={b}
+                onClick={() => setBilling(b)}
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '50px',
+                  background: billing === b ? 'var(--bg-card)' : 'transparent',
+                  border: billing === b ? '1px solid var(--brand-primary)' : '1px solid var(--border)',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s var(--ease-smooth)',
+                }}
+              >
+                {b === 'monthly'
+                  ? 'Monthly'
+                  : '🎁 Annual (Save 20%)'}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns:
+              'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: 24,
+            marginBottom: 60,
+          }}
+        >
+          {PLANS.map((plan) => {
+            const finalPrice =
+              billing === 'annual' && plan.price > 0
+                ? (plan.price * 0.8).toFixed(2)
+                : plan.price
+
+            const isCurrent = user.plan === plan.id
+
+            return (
+              <div
+                key={plan.id}
+                className="glass-card hover-lift"
+                style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  border: plan.highlight 
+                    ? `1px solid ${plan.color}` 
+                    : '1px solid var(--border)',
+                }}
+              >
+                {plan.badge && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: -8,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      background: plan.color,
+                      color: 'white',
+                      borderRadius: '50px',
+                      padding: '4px 16px',
+                      fontWeight: 900,
+                      fontSize: '0.8rem',
+                      boxShadow: 'var(--shadow-sm)',
+                    }}
+                  >
+                    {plan.badge}
+                  </div>
+                )}
+
+                <div
+                  style={{
+                    fontSize: 48,
+                    marginBottom: 16,
+                    textAlign: 'center',
+                  }}
+                >
+                  {plan.emoji}
+                </div>
+
+                <div
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '2rem',
+                    color: plan.color,
+                    textAlign: 'center',
+                    marginBottom: 4,
+                  }}
+                >
+                  {plan.name}
+                </div>
+
+                <div
+                  style={{
+                    color: 'var(--text-muted)',
+                    fontWeight: 600,
+                    fontSize: '0.95rem',
+                    textAlign: 'center',
+                    marginBottom: 24,
+                  }}
+                >
+                  {plan.tagline}
+                </div>
+
+                <div style={{ marginBottom: 28 }}>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-display)',
+                      fontSize: '3.5rem',
+                      color: 'var(--text-primary)',
+                      display: 'block',
+                    }}
+                  >
+                    {plan.price === 0
+                      ? '$0'
+                      : `$${finalPrice}`}
+                  </span>
+
+                  <span
+                    style={{
+                      color: 'var(--text-muted)',
+                      fontWeight: 600,
+                      fontSize: '0.9rem',
+                      display: 'block',
+                      marginTop: 4,
+                    }}
+                  >
+                    /{plan.period}
+                  </span>
+                </div>
+
+                <div style={{ marginBottom: 28 }}>
+                  {plan.features.map((feature, i) => {
+                    const enabled =
+                      feature.startsWith('✅')
+
+                    const icon = enabled ? '✅' : '❌'
+
+                    const text = feature
+                      .replace('✅ ', '')
+                      .replace('❌ ', '')
+
+                    return (
+                      <div
+                        key={i}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: 8,
+                          marginBottom: 10,
+                          opacity: enabled ? 1 : 0.5,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 1.2,
+                            color: enabled 
+                              ? '#06D6A0' 
+                              : '#EF233C',
+                          }}
+                        >
+                          {icon}
+                        </span>
+
+                        <span
+                          style={{
+                            fontWeight: 600,
+                            fontSize: '0.9rem',
+                            color:
+                              'var(--text-secondary)',
+                            lineHeight: 1.5,
+                          }}
+                        >
+                          {text}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
+
+                <button
+                  className="btn"
+                  onClick={() => handleSelect(plan.id)}
+                  disabled={isCurrent || Boolean(checkoutPlan)}
+                  style={{
+                    width: '100%',
+                    padding: '14px 20px',
+                    borderRadius: '50px',
+                    fontSize: '1rem',
+                    fontWeight: 700,
+                    transition: 'all 0.2s var(--ease-smooth)',
+                    background: isCurrent
+                      ? 'var(--bg-tertiary)'
+                      : plan.highlight
+                      ? plan.color
+                      : 'white',
+                    color: isCurrent
+                      ? 'var(--text-muted)'
+                      : plan.highlight
+                      ? 'white'
+                      : 'var(--text-primary)',
+                    border: `1px solid ${plan.color}`,
+                  }}
+                >
+                  {isCurrent
+                    ? '✓ Current Plan'
+                    : checkoutPlan === plan.id
+                    ? 'Processing…'
+                    : plan.cta}
+                </button>
+
+                {plan.id !== 'free' && (
+                  <div
+                    style={{
+                      textAlign: 'center',
+                      marginTop: 12,
+                      color: 'var(--text-muted)',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    7-day free trial · Cancel anytime
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
+
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: 48,
+          }}
+        >
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              color: '#FFD23F',
+              fontSize: '2rem',
+              marginBottom: 12,
+            }}
+          >
+            ★★★★★
+          </div>
+
+          <p
+            style={{
+              fontWeight: 600,
+              fontSize: '1.1rem',
+              color: 'var(--text-secondary)',
+              maxWidth: 500,
+              margin: '0 auto',
+              lineHeight: 1.7,
+            }}
+          >
+            "StudyStreak transformed my study habits and improved my grades significantly."
+          </p>
+
+          <div
+            style={{
+              marginTop: 12,
+              fontWeight: 700,
+              color: 'var(--text-primary)',
+            }}
+          >
+            — Alex T., University Student
+          </div>
+        </div>
+
+        <section className="section">
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '2.2rem',
+              textAlign: 'center',
+              marginBottom: 28,
+              color: 'var(--text-primary)',
+            }}
+          >
+            Got Questions? 🙋
+          </h2>
+
+          <div
+            style={{
+              maxWidth: 640,
+              margin: '0 auto',
+            }}
+          >
+            {FAQ.map((faq, i) => (
+              <div
+                key={i}
+                className="glass-card hover-lift"
+                style={{
+                  marginBottom: 12,
+                  overflow: 'hidden',
+                }}
+                onClick={() =>
+                  setActiveFaq(
+                    activeFaq === i ? null : i
+                  )
+                }
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '20px 24px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontWeight: 700,
+                      fontSize: '1rem',
+                    }}
+                  >
+                    {faq.q}
+                  </span>
+
+                  <span
+                    style={{
+                      color: 'var(--brand-primary)',
+                      fontWeight: 800,
+                      fontSize: '1.2rem',
+                      transition: 'transform 0.2s var(--ease-smooth)',
+                      transform: activeFaq === i ? 'rotate(180deg)' : 'rotate(0deg)',
+                    }}
+                  >
+                    +
+                  </span>
+                </div>
+
+                {activeFaq === i && (
+                  <div
+                    style={{
+                      padding: '0 24px 20px 24px',
+                      color: 'var(--text-secondary)',
+                      fontWeight: 600,
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      </section>
+    </div>
+  )
+}
