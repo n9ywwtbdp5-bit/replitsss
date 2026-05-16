@@ -1,6 +1,6 @@
 import { loadStripe } from '@stripe/stripe-js'
 
-const STRIPE_PUBLIC_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY?.trim()
+const STRIPE_PUBLIC_KEY = import.meta.env.pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC?.trim()
 
 const PRICE_IDS = {
   monthly: {
