@@ -1,6 +1,6 @@
 import { loadStripe } from '@stripe/stripe-js'
 
-const STRIPE_PUBLIC_KEY = import.meta.env.pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC?.trim()
+const pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC = import.meta.env.pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC?.trim()
 
 const PRICE_IDS = {
   monthly: {
@@ -13,7 +13,7 @@ const PRICE_IDS = {
   },
 }
 
-const stripePromise = STRIPE_PUBLIC_KEY ? loadStripe(STRIPE_PUBLIC_KEY) : null
+const stripePromise = pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC ? loadStripe(pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC) : null
 
 const getBillingLabel = (billing) => billing === 'annual' ? 'annual' : 'monthly'
 
@@ -22,10 +22,10 @@ export async function startStripeCheckout({ plan, billing = 'monthly' }) {
     return { ok: false, message: 'Please choose Pro or Premium to continue checkout.' }
   }
 
-  if (!STRIPE_PUBLIC_KEY) {
+  if (!pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC) {
     return {
       ok: false,
-      message: 'Stripe is not configured yet. Add VITE_STRIPE_PUBLIC_KEY and try again.',
+      message: 'Stripe is not configured yet. Add VITE_pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC and try again.',
     }
   }
 

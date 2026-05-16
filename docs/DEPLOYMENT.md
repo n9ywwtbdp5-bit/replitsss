@@ -72,7 +72,7 @@ git push -u origin main
 3. Copy the Price IDs (start with `price_`)
 4. Copy `.env.example` to `.env`
 5. Add environment variables:
-   - `VITE_STRIPE_PUBLIC_KEY=pk_live_xxx`
+   - `VITE_pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC=pk_live_xxx`
    - `VITE_STRIPE_PRICE_PRO_MONTHLY=price_xxx`
    - `VITE_STRIPE_PRICE_PREMIUM_MONTHLY=price_xxx`
    - Optional annual billing IDs:

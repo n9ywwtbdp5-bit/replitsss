@@ -96,7 +96,7 @@ wrangler pages deploy dist --project-name=studystreak
 1. Create a [Stripe account](https://stripe.com)
 2. Create two products: Pro ($16.99/mo) and Premium ($23.99/mo)
 3. Copy `.env.example` to `.env` and set:
-   - `VITE_STRIPE_PUBLIC_KEY`
+   - `VITE_pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC`
    - `VITE_STRIPE_PRICE_PRO_MONTHLY`
    - `VITE_STRIPE_PRICE_PREMIUM_MONTHLY`
    - Optional annual IDs: `VITE_STRIPE_PRICE_PRO_ANNUAL`, `VITE_STRIPE_PRICE_PREMIUM_ANNUAL`
