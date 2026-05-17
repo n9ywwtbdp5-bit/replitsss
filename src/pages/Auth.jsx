@@ -8,7 +8,7 @@ const supabase = createClient(
 );
 
 export default function Auth() {
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [mode, setMode] = useState("login"); // "login" | "signup" | "forgot"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,17 +31,12 @@ const navigate = useNavigate();
     setLoading(true); setError("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-
     if (error) {
       setError(error.message);
     } else {
       setSuccess("Logged in! Redirecting...");
       setTimeout(() => navigate("/app/dashboard"), 500);
     }
-
-
-    if (error) { setError(error.message); }
-    else { setSuccess("Logged in! Redirecting..."); setTimeout(() => (window.location.href = "/app/dashboard"), 1000); }
 
     setLoading(false);
   };
