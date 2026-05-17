@@ -8,12 +8,8 @@ const supabase = createClient(
 );
 
 export default function Auth() {
-<<<<<<< HEAD
-  const navigate = useNavigate();
+const navigate = useNavigate();
   const [mode, setMode] = useState("login"); // "login" | "signup" | "forgot"
-=======
-  const [mode, setMode] = useState("login");
->>>>>>> 6e928f5bc59b19b388d6c97f43b2768b26d9cd1b
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,7 +30,7 @@ export default function Auth() {
     e.preventDefault();
     setLoading(true); setError("");
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-<<<<<<< HEAD
+
 
     if (error) {
       setError(error.message);
@@ -43,10 +39,10 @@ export default function Auth() {
       setTimeout(() => navigate("/app/dashboard"), 500);
     }
 
-=======
+
     if (error) { setError(error.message); }
     else { setSuccess("Logged in! Redirecting..."); setTimeout(() => (window.location.href = "/app/dashboard"), 1000); }
->>>>>>> 6e928f5bc59b19b388d6c97f43b2768b26d9cd1b
+
     setLoading(false);
   };
 
