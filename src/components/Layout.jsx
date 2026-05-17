@@ -1,6 +1,7 @@
 import React from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { useStore } from '../store.js'
+import { useAuth } from '../lib/useAuth.jsx'
 
 const NAV = [
   { to: '/app/dashboard',    label: 'Dashboard',    icon: '⬡' },

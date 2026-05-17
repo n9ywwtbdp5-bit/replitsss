@@ -6,34 +6,6 @@ const PORT = process.env.PORT || 5000;
 
 app.use(express.json());
 
-app.get("/api/auth/user", (req, res) => {
-  const userId = req.headers["x-replit-user-id"];
-  const userName = req.headers["x-replit-user-name"];
-  const userImage = req.headers["x-replit-user-profile-image"];
-
-  if (!userId) {
-    return res.status(401).json({ user: null });
-  }
-
-  res.json({
-    user: {
-      id: userId,
-      name: userName || "Student",
-      profileImage: userImage || null,
-    },
-  });
-});
-
-app.get("/api/auth/login", (req, res) => {
-  res.redirect(
-    "https://replit.com/auth_with_repl_site?domain=" + req.headers.host
-  );
-});
-
-app.get("/api/auth/logout", (req, res) => {
-  res.redirect("/");
-});
-
 app.post("/api/stripe/checkout", async (req, res) => {
   const { plan, billing = "monthly" } = req.body;
 
@@ -43,7 +15,9 @@ app.post("/api/stripe/checkout", async (req, res) => {
 
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) {
-    return res.status(503).json({ message: "Payments are not configured yet. Please add your Stripe keys." });
+    return res.status(503).json({
+      message: "Payments are not configured yet. Please contact support.",
+    });
   }
 
   const PRICE_IDS = {
@@ -59,14 +33,20 @@ app.post("/api/stripe/checkout", async (req, res) => {
 
   const priceId = PRICE_IDS[billing]?.[plan];
   if (!priceId) {
-    return res.status(400).json({ message: `No price configured for ${plan} (${billing}).` });
+    return res
+      .status(400)
+      .json({ message: `No price configured for ${plan} (${billing}).` });
   }
 
   try {
     const { default: Stripe } = await import("stripe");
     const stripe = new Stripe(secretKey);
 
-    const origin = req.headers.origin || `https://${req.headers.host}`;
+    const origin =
+      req.headers.origin ||
+      `https://${req.headers.host}` ||
+      "http://localhost:5000";
+
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],

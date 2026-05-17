@@ -19,6 +19,37 @@ function saveSubjectTime(id, mins) {
   localStorage.setItem(SUBJECT_TIME_KEY, JSON.stringify(t))
 }
 
+function playCompletionSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)()
+    const notes = [523.25, 659.25, 783.99, 1046.50]
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator()
+      const gain = ctx.createGain()
+      osc.connect(gain)
+      gain.connect(ctx.destination)
+      osc.type = 'sine'
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.18)
+      gain.gain.setValueAtTime(0.28, ctx.currentTime + i * 0.18)
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.18 + 0.4)
+      osc.start(ctx.currentTime + i * 0.18)
+      osc.stop(ctx.currentTime + i * 0.18 + 0.4)
+    })
+  } catch (_) {}
+}
+
+function sendBrowserNotification(xp) {
+  if (!('Notification' in window)) return
+  if (Notification.permission === 'granted') {
+    new Notification('StudyStreak 🔥', {
+      body: `Session complete! +${xp} XP earned. Keep it up!`,
+      icon: '/favicon.ico',
+    })
+  } else if (Notification.permission !== 'denied') {
+    Notification.requestPermission()
+  }
+}
+
 export default function Timer() {
   const { subjects, activeSubjects, addXP, addMinutes, openPaywall, user } = useStore()
   const [mode, setMode]             = useState('pomodoro')
@@ -29,8 +60,14 @@ export default function Timer() {
   const [sessions, setSessions]     = useState(0)
   const [finished, setFinished]     = useState(false)
   const [subjectTimes, setSubjectTimes] = useState(getSubjectTimes())
+  const [soundEnabled, setSoundEnabled] = useState(true)
+  const [notifEnabled, setNotifEnabled] = useState(false)
   const intervalRef = useRef(null)
   const totalRef    = useRef(25 * 60)
+
+  useEffect(() => {
+    if (Notification.permission === 'granted') setNotifEnabled(true)
+  }, [])
 
   useEffect(() => {
     if (running) {
@@ -53,13 +90,16 @@ export default function Timer() {
 
   const handleComplete = () => {
     const minsStudied = Math.floor(totalRef.current / 60)
-    addXP(minsStudied * 3)
+    const xpEarned = minsStudied * 3
+    addXP(xpEarned)
     addMinutes(minsStudied)
     saveSubjectTime(subject, minsStudied)
     setSubjectTimes(getSubjectTimes())
     setSessions(s => s + 1)
     setFinished(true)
-    setTimeout(() => setFinished(false), 4000)
+    setTimeout(() => setFinished(false), 5000)
+    if (soundEnabled) playCompletionSound()
+    if (notifEnabled) sendBrowserNotification(xpEarned)
   }
 
   const selectMode = (m) => {
@@ -80,6 +120,12 @@ export default function Timer() {
     totalRef.current = secs
   }
 
+  const requestNotif = async () => {
+    if (!('Notification' in window)) return
+    const perm = await Notification.requestPermission()
+    setNotifEnabled(perm === 'granted')
+  }
+
   const pct  = totalRef.current > 0 ? 1 - seconds / totalRef.current : 0
   const mins = String(Math.floor(seconds / 60)).padStart(2, '0')
   const secs = String(seconds % 60).padStart(2, '0')
@@ -90,7 +136,6 @@ export default function Timer() {
 
   const selectedSubject = subjects.find(s => s.id === subject)
   const xpPreview       = Math.floor((totalRef.current / 60) * 3)
-
   const totalTrackedMins = Object.values(subjectTimes).reduce((a, b) => a + b, 0)
 
   return (
@@ -263,6 +308,30 @@ export default function Timer() {
           }}>
             ⚡ +{xpPreview} XP on completion
           </div>
+
+          {/* Notification toggles */}
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <button onClick={() => setSoundEnabled(s => !s)} title="Toggle completion sound" style={{
+              display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px',
+              borderRadius: 99, border: '1px solid rgba(255,255,255,0.1)',
+              background: soundEnabled ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.04)',
+              color: soundEnabled ? '#818CF8' : '#4B5563',
+              cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: '0.75rem',
+              transition: 'all 0.2s',
+            }}>
+              {soundEnabled ? '🔔' : '🔕'} Sound
+            </button>
+            <button onClick={requestNotif} title="Enable browser notifications" style={{
+              display: 'flex', alignItems: 'center', gap: 6, padding: '6px 12px',
+              borderRadius: 99, border: '1px solid rgba(255,255,255,0.1)',
+              background: notifEnabled ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.04)',
+              color: notifEnabled ? '#34D399' : '#4B5563',
+              cursor: 'pointer', fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: '0.75rem',
+              transition: 'all 0.2s',
+            }}>
+              🖥 {notifEnabled ? 'Notifs On' : 'Enable Notifs'}
+            </button>
+          </div>
         </div>
 
         {/* Right column */}
@@ -291,10 +360,7 @@ export default function Timer() {
                     <span style={{ fontSize: 16 }}>{emoji}</span> {label}
                   </span>
                   {subjectTimes[id] > 0 && (
-                    <span style={{
-                      fontSize: '0.72rem', color: subject === id ? color : '#4B5563',
-                      fontWeight: 600,
-                    }}>
+                    <span style={{ fontSize: '0.72rem', color: subject === id ? color : '#4B5563', fontWeight: 600 }}>
                       {subjectTimes[id]}m
                     </span>
                   )}
@@ -317,24 +383,22 @@ export default function Timer() {
                   return (
                     <div key={id}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                        <span style={{ fontSize: '0.8rem', color: '#9CA3AF', fontWeight: 600 }}>
-                          {emoji} {label}
-                        </span>
-                        <span style={{ fontSize: '0.8rem', color: color, fontWeight: 700 }}>
-                          {subjectTimes[id]}m
-                        </span>
+                        <span style={{ fontSize: '0.8rem', color: '#9CA3AF', fontWeight: 600 }}>{emoji} {label}</span>
+                        <span style={{ fontSize: '0.8rem', color: color, fontWeight: 700 }}>{subjectTimes[id]}m</span>
                       </div>
                       <div style={{ height: 5, borderRadius: 99, background: 'rgba(255,255,255,0.06)', overflow: 'hidden' }}>
                         <div style={{
-                          height: '100%', borderRadius: 99,
-                          width: `${pct}%`,
-                          background: color,
-                          transition: 'width 0.5s ease',
+                          height: '100%', borderRadius: 99, width: `${pct}%`,
+                          background: color, transition: 'width 0.5s ease',
                         }} />
                       </div>
                     </div>
                   )
                 })}
+                <div style={{ marginTop: 6, paddingTop: 10, borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#6B7280', fontWeight: 700 }}>Total today</span>
+                  <span style={{ fontSize: '0.8rem', color: '#FB923C', fontWeight: 800 }}>{totalTrackedMins}m</span>
+                </div>
               </div>
             </div>
           )}
