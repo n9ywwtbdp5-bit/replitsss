@@ -11,26 +11,37 @@ import StudyPlanner from './pages/StudyPlanner.jsx'
 import Pricing from './pages/Pricing.jsx'
 import PaywallModal from './components/PaywallModal.jsx'
 import { useStore } from './store.js'
+import { AuthProvider } from './lib/useAuth'
+import Auth from './pages/Auth'
+
+import Auth from './pages/Auth'
+import { AuthProvider } from './lib/useAuth'
+
+import Auth from './pages/Auth'
+import { AuthProvider } from './lib/useAuth'
 
 export default function App() {
   const showPaywall = useStore((s) => s.showPaywall)
 
   return (
-    <>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/app" element={<Layout />}>
-          <Route index element={<Navigate to="/app/dashboard" replace />} />
-          <Route path="dashboard"    element={<Dashboard />} />
-          <Route path="timer"        element={<Timer />} />
-          <Route path="progress"     element={<Progress />} />
-          <Route path="achievements" element={<Achievements />} />
-          <Route path="leaderboard"  element={<Leaderboard />} />
-          <Route path="planner"      element={<StudyPlanner />} />
-          <Route path="pricing"      element={<Pricing />} />
-        </Route>
-      </Routes>
-      {showPaywall && <PaywallModal />}
-    </>
+    <AuthProvider>
+      <>
+        <Routes>
+          <Route path="/login" element={<Auth />} />
+          <Route path="/" element={<Landing />} />
+          <Route path="/app" element={<Layout />}>
+            <Route index element={<Navigate to="/app/dashboard" replace />} />
+            <Route path="dashboard"    element={<Dashboard />} />
+            <Route path="timer"        element={<Timer />} />
+            <Route path="progress"     element={<Progress />} />
+            <Route path="achievements" element={<Achievements />} />
+            <Route path="leaderboard"  element={<Leaderboard />} />
+            <Route path="planner"      element={<StudyPlanner />} />
+            <Route path="pricing"      element={<Pricing />} />
+          </Route>
+        </Routes>
+        {showPaywall && <PaywallModal />}
+      </>
+    </AuthProvider>
   )
 }

@@ -1,72 +1,47 @@
 import { loadStripe } from '@stripe/stripe-js'
 
-const pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC = import.meta.env.pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC?.trim()
+const STRIPE_KEY = import.meta.env.VITE_STRIPE_PUBLIC_KEY?.trim()
 
 const PRICE_IDS = {
   monthly: {
-    pro: import.meta.env.VITE_STRIPE_PRICE_PRO_MONTHLY || 'price_1TXgQPHU1AxqRSaJNNSYsxDc',
-    premium: import.meta.env.VITE_STRIPE_PRICE_PREMIUM_MONTHLY || 'price_1TXgQPHU1AxqRSaJnSB8BtEW',
+    pro:     import.meta.env.VITE_STRIPE_PRICE_PRO_MONTHLY     || '',
+    premium: import.meta.env.VITE_STRIPE_PRICE_PREMIUM_MONTHLY || '',
   },
   annual: {
-    pro: import.meta.env.VITE_STRIPE_PRICE_PRO_ANNUAL || '',
-    premium: import.meta.env.VITE_STRIPE_PRICE_PREMIUM_ANNUAL || '',
+    pro:     import.meta.env.VITE_STRIPE_PRICE_PRO_ANNUAL      || '',
+    premium: import.meta.env.VITE_STRIPE_PRICE_PREMIUM_ANNUAL  || '',
   },
 }
 
-const stripePromise = pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC ? loadStripe(pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC) : null
-
-const getBillingLabel = (billing) => billing === 'annual' ? 'annual' : 'monthly'
+const stripePromise = STRIPE_KEY ? loadStripe(STRIPE_KEY) : null
 
 export async function startStripeCheckout({ plan, billing = 'monthly' }) {
   if (!plan || plan === 'free') {
-    return { ok: false, message: 'Please choose Pro or Premium to continue checkout.' }
+    return { ok: false, message: 'Please choose Pro or Premium to continue.' }
   }
-
-  if (!pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC) {
-    return {
-      ok: false,
-      message: 'Stripe is not configured yet. Add VITE_pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC and try again.',
-    }
+  if (!STRIPE_KEY) {
+    return { ok: false, message: 'Stripe is not configured. Add VITE_STRIPE_PUBLIC_KEY to your .env file.' }
   }
 
   const priceId = PRICE_IDS[billing]?.[plan]
-
   if (!priceId) {
-    return {
-      ok: false,
-      message: `${getBillingLabel(billing)} checkout for ${plan} is not configured yet.`,
-    }
+    return { ok: false, message: `No price configured for ${plan} (${billing}).` }
   }
 
   try {
     const stripe = await stripePromise
-
-    if (!stripe) {
-      return {
-        ok: false,
-        message: 'Unable to load Stripe checkout right now. Please refresh and retry.',
-      }
-    }
+    if (!stripe) return { ok: false, message: 'Could not load Stripe. Please refresh.' }
 
     const result = await stripe.redirectToCheckout({
       lineItems: [{ price: priceId, quantity: 1 }],
       mode: 'subscription',
       successUrl: `${window.location.origin}/app/dashboard?payment=success&plan=${plan}`,
-      cancelUrl: `${window.location.origin}/app/pricing?billing=${billing}`,
+      cancelUrl:  `${window.location.origin}/app/pricing?billing=${billing}`,
     })
 
-    if (result?.error) {
-      return {
-        ok: false,
-        message: result.error.message || 'Checkout could not start. Please try again.',
-      }
-    }
-
+    if (result?.error) return { ok: false, message: result.error.message }
     return { ok: true }
-  } catch (error) {
-    return {
-      ok: false,
-      message: error?.message || 'Checkout failed to start. Please try again.',
-    }
+  } catch (err) {
+    return { ok: false, message: err?.message || 'Checkout failed. Please try again.' }
   }
 }
