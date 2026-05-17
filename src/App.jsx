@@ -14,12 +14,6 @@ import { useStore } from './store.js'
 import { AuthProvider } from './lib/useAuth'
 import Auth from './pages/Auth'
 
-import Auth from './pages/Auth'
-import { AuthProvider } from './lib/useAuth'
-
-import Auth from './pages/Auth'
-import { AuthProvider } from './lib/useAuth'
-
 export default function App() {
   const showPaywall = useStore((s) => s.showPaywall)
 
