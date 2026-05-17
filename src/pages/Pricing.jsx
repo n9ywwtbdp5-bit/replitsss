@@ -94,11 +94,14 @@ export default function Pricing() {
     if (b === 'monthly' || b === 'annual') setBilling(b)
   }, [])
 
-  const handleSelect = async (plan) => {
+ const handleSelect = async (plan) => {
     if (plan === 'free' || checkoutPlan) return
     setCheckoutPlan(plan)
     setErrorMsg('')
-    const result = await startStripeCheckout({ plan, billing })
+    
+    // Pass the user object fetched from useStore() right into checkout config
+    const result = await startStripeCheckout({ plan, billing, user })
+    
     if (!result.ok) {
       setErrorMsg(result.message)
       setCheckoutPlan('')

@@ -1,42 +1,78 @@
-import { Navigate } from 'react-router-dom'
-import { useAuth } from '../lib/useAuth'
+import { useState, useEffect, createContext, useContext } from "react";
+import { createClient } from "@supabase/supabase-js";
 
-export default function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth()
+const supabase = createClient(
+  "https://pxagibfmciysowbfpsds.supabase.co",
+  "sb_publishable_znQXBRBmdjvc_LBHy0Bu7Q_ahSIj8iL"
+);
 
-  if (loading) {
-    return (
-      <div style={{
-        minHeight: '100vh',
-        background: '#0d0f14',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 16,
-        }}>
-          <div style={{ fontSize: 32 }}>🔥</div>
-          <div style={{
-            width: 32,
-            height: 32,
-            border: '3px solid rgba(249,115,22,0.2)',
-            borderTop: '3px solid #F97316',
-            borderRadius: '50%',
-            animation: 'spin 0.7s linear infinite',
-          }} />
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
-      </div>
-    )
-  }
+const AuthContext = createContext(null);
 
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  return children
+  const fetchUserWithPlan = async (authUser) => {
+    if (!authUser) {
+      setUser(null);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("users")
+      .select("plan")
+      .eq("id", authUser.id)
+      .single();
+
+    if (error || !data) {
+      setUser({ ...authUser, plan: "free" });
+    } else {
+      setUser({ ...authUser, plan: data.plan || "free" });
+    }
+  };
+
+  useEffect(() => {
+    // Flag to ignore the getSession result if onAuthStateChange fires first
+    let initialised = false;
+
+    // 2. Listen for auth changes FIRST so we don't miss events
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      initialised = true;
+      setLoading(true); // ← key fix: hold the gate while we fetch the plan
+      if (session?.user) {
+        await fetchUserWithPlan(session.user);
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    // 1. Then get the initial session (in case onAuthStateChange doesn't fire)
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (initialised) return; // onAuthStateChange already handled it
+      if (session?.user) {
+        await fetchUserWithPlan(session.user);
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, logout, supabase }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
 }
