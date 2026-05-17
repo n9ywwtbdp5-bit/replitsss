@@ -67,8 +67,8 @@ git push -u origin main
 
 1. Create account at stripe.com
 2. Create Products:
-   - "StudyStreak Pro" — $16.99/month recurring
-   - "StudyStreak Premium" — $23.99/month recurring
+   - "StudyStreak Pro" — $8.99/month recurring
+   - "StudyStreak Premium" — $12.99/month recurring
 3. Copy the Price IDs (start with `price_`)
 4. Copy `.env.example` to `.env`
 5. Add environment variables:

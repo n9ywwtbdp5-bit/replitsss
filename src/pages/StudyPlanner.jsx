@@ -160,7 +160,7 @@ export default function StudyPlanner() {
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 10px 32px rgba(139,92,246,0.55)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 6px 24px rgba(139,92,246,0.45)'; }}
             >
-              👑 Unlock with Premium — $23.99/mo
+              👑 Unlock with Premium — $12.99/mo
             </button>
             <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.78rem', fontWeight: 500, marginTop: 10 }}>
               7-day free trial · Cancel anytime

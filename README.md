@@ -11,7 +11,7 @@
 - **⏱️ Smart Timer** — Pomodoro + custom sessions per subject
 - **📊 Analytics** — Weekly charts, calendar heatmap, subject breakdown
 - **🏆 Achievements** — 50+ badges to unlock
-- **💳 Subscriptions** — Free / Pro ($16.99/mo) / Premium ($23.99/mo)
+- **💳 Subscriptions** — Free / Pro ($8.99/mo) / Premium ($12.99/mo)
 
 ## 🚀 Quick Start
 
@@ -94,7 +94,7 @@ wrangler pages deploy dist --project-name=studystreak
 ## 💳 Adding Stripe Payments
 
 1. Create a [Stripe account](https://stripe.com)
-2. Create two products: Pro ($16.99/mo) and Premium ($23.99/mo)
+2. Create two products: Pro ($8.99/mo) and Premium ($12.99/mo)
 3. Copy `.env.example` to `.env` and set:
    - `VITE_pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC`
    - `VITE_STRIPE_PRICE_PRO_MONTHLY`
@@ -126,7 +126,7 @@ To hit $10k/month, here's a content playbook:
 - **Study with me** — use the timer on screen while studying
 - **"I dare you to study for 25 minutes"** — challenge format
 
-Monetization path: 1,000 paying users × $16.99 = ~$17k/month 🚀
+Monetization path: 1,000 paying users × $8.99 = ~$17k/month 🚀
 
 ## 📄 License
 

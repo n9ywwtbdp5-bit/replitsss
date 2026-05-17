@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -7,6 +8,7 @@ const supabase = createClient(
 );
 
 export default function Auth() {
+  const navigate = useNavigate();
   const [mode, setMode] = useState("login"); // "login" | "signup" | "forgot"
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -42,8 +44,7 @@ export default function Auth() {
       setError(error.message);
     } else {
       setSuccess("Logged in! Redirecting...");
-      // Replace with your router navigation, e.g. navigate("/dashboard")
-      setTimeout(() => (window.location.href = "/dashboard"), 1000);
+      setTimeout(() => navigate("/app/dashboard"), 500);
     }
 
     setLoading(false);
@@ -105,7 +106,7 @@ export default function Auth() {
   const handleGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+      options: { redirectTo: `${window.location.origin}/app/dashboard` },
     });
     if (error) setError(error.message);
   };

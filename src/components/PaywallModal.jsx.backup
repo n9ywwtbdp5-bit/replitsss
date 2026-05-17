@@ -56,7 +56,7 @@ export default function PaywallModal() {
             <div style={{ position: 'absolute', top: -10, left: '50%', transform: 'translateX(-50%)', background: 'var(--brand-orange)', color: 'white', borderRadius: 99, padding: '2px 12px', fontSize: '0.72rem', fontWeight: 900, whiteSpace: 'nowrap' }}>MOST POPULAR</div>
             <div style={{ fontSize: 28, marginBottom: 8 }}>⚡</div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--brand-orange)' }}>Pro</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', lineHeight: 1, margin: '6px 0' }}>$16.99</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', lineHeight: 1, margin: '6px 0' }}>$8.99</div>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', fontWeight: 700, marginBottom: 12 }}>per month</div>
             {['All subjects', 'Advanced analytics', '3 streak shields', '50+ achievements'].map((f) => (
               <div key={f} style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
@@ -83,7 +83,7 @@ export default function PaywallModal() {
           >
             <div style={{ fontSize: 28, marginBottom: 8 }}>👑</div>
             <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.3rem', color: 'var(--brand-purple)' }}>Premium</div>
-            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', lineHeight: 1, margin: '6px 0' }}>$23.99</div>
+            <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.8rem', lineHeight: 1, margin: '6px 0' }}>$12.99</div>
             <div style={{ color: 'var(--text-muted)', fontSize: '0.78rem', fontWeight: 700, marginBottom: 12 }}>per month</div>
             {['Everything in Pro', 'AI study planner', 'Unlimited shields', 'Leaderboards'].map((f) => (
               <div key={f} style={{ display: 'flex', gap: 6, marginBottom: 4 }}>
