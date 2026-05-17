@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node server.js",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src --ext .js,.jsx"
@@ -13,6 +13,7 @@
     "@stripe/stripe-js": "^9.5.0",
     "@supabase/supabase-js": "^2.105.4",
     "date-fns": "^3.6.0",
+    "express": "^4.22.2",
     "framer-motion": "^11.3.19",
     "lucide-react": "^0.383.0",
     "react": "^18.3.1",
@@ -20,6 +21,7 @@
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.0",
     "recharts": "^2.12.7",
+    "stripe": "^22.1.1",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
