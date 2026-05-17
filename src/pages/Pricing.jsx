@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useStore } from '../store.js'
 import { startStripeCheckout } from '../lib/stripeCheckout.js'
+import { useAuth } from '../lib/useAuth'
 
 const PLANS = [
   {
@@ -83,7 +84,7 @@ const FAQ = [
 ]
 
 export default function Pricing() {
-  const { user } = useStore()
+  const { user } = useAuth()
   const [billing, setBilling]       = useState('monthly')
   const [activeFaq, setActiveFaq]   = useState(null)
   const [checkoutPlan, setCheckoutPlan] = useState('')
@@ -94,14 +95,13 @@ export default function Pricing() {
     if (b === 'monthly' || b === 'annual') setBilling(b)
   }, [])
 
- const handleSelect = async (plan) => {
+  const handleSelect = async (plan) => {
     if (plan === 'free' || checkoutPlan) return
     setCheckoutPlan(plan)
     setErrorMsg('')
-    
-    // Pass the user object fetched from useStore() right into checkout config
+
     const result = await startStripeCheckout({ plan, billing, user })
-    
+
     if (!result.ok) {
       setErrorMsg(result.message)
       setCheckoutPlan('')
@@ -162,7 +162,7 @@ export default function Pricing() {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 20, marginBottom: 56 }}>
         {PLANS.map(plan => {
           const finalPrice = billing === 'annual' && plan.price > 0 ? (plan.price * 0.8).toFixed(2) : plan.price
-          const isCurrent = user.plan === plan.id
+          const isCurrent = user?.plan === plan.id
 
           return (
             <div key={plan.id} className="card hover-lift" style={{
