@@ -15,6 +15,7 @@ const NAV = [
 
 export default function Layout() {
   const { user, currentStreak, longestStreak, xp, level, xpToNextLevel } = useStore()
+  const { logout } = useAuth()
   const navigate = useNavigate()
   const xpPct = Math.min(100, Math.round((xp / xpToNextLevel) * 100))
 
@@ -150,6 +151,20 @@ export default function Layout() {
             }}>Upgrade</button>
           )}
         </div>
+
+        {/* Log out */}
+        <button onClick={logout} style={{
+          marginTop: 10, width: '100%', padding: '9px 12px', borderRadius: 10,
+          background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.18)',
+          color: '#F87171', fontFamily: 'var(--font-body)', fontWeight: 700,
+          fontSize: '0.82rem', cursor: 'pointer', transition: 'all 0.2s',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+        }}
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.15)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.35)'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(239,68,68,0.08)'; e.currentTarget.style.borderColor = 'rgba(239,68,68,0.18)'; }}
+        >
+          <span>↩</span> Log Out
+        </button>
       </aside>
 
       {/* Main content */}
