@@ -24,7 +24,7 @@ const initialWeeklyXP = initialWeekData.reduce((s, d) => s + d.xp, 0)
 
 export const useStore = create(
   persist(
-    (set, get) => ({
+    (set) => ({
       // User
       user: {
         name: 'Student',

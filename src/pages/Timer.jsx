@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useCallback, useState, useEffect, useRef } from 'react'
 import { useStore } from '../store.js'
 
 const MODES = [
@@ -35,7 +35,9 @@ function playCompletionSound() {
       osc.start(ctx.currentTime + i * 0.18)
       osc.stop(ctx.currentTime + i * 0.18 + 0.4)
     })
-  } catch (_) {}
+  } catch {
+    // Sound is a nice-to-have and may be blocked by browser audio policies.
+  }
 }
 
 function sendBrowserNotification(xp) {
@@ -65,6 +67,20 @@ export default function Timer() {
   const intervalRef = useRef(null)
   const totalRef    = useRef(25 * 60)
 
+  const handleComplete = useCallback(() => {
+    const minsStudied = Math.floor(totalRef.current / 60)
+    const xpEarned = minsStudied * 3
+    addXP(xpEarned)
+    addMinutes(minsStudied)
+    saveSubjectTime(subject, minsStudied)
+    setSubjectTimes(getSubjectTimes())
+    setSessions(s => s + 1)
+    setFinished(true)
+    setTimeout(() => setFinished(false), 5000)
+    if (soundEnabled) playCompletionSound()
+    if (notifEnabled) sendBrowserNotification(xpEarned)
+  }, [addMinutes, addXP, notifEnabled, soundEnabled, subject])
+
   useEffect(() => {
     if (Notification.permission === 'granted') setNotifEnabled(true)
   }, [])
@@ -86,21 +102,7 @@ export default function Timer() {
       clearInterval(intervalRef.current)
     }
     return () => clearInterval(intervalRef.current)
-  }, [running])
-
-  const handleComplete = () => {
-    const minsStudied = Math.floor(totalRef.current / 60)
-    const xpEarned = minsStudied * 3
-    addXP(xpEarned)
-    addMinutes(minsStudied)
-    saveSubjectTime(subject, minsStudied)
-    setSubjectTimes(getSubjectTimes())
-    setSessions(s => s + 1)
-    setFinished(true)
-    setTimeout(() => setFinished(false), 5000)
-    if (soundEnabled) playCompletionSound()
-    if (notifEnabled) sendBrowserNotification(xpEarned)
-  }
+  }, [running, handleComplete])
 
   const selectMode = (m) => {
     setMode(m.id)

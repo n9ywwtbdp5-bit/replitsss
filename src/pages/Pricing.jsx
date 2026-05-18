@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useStore } from '../store.js'
 import { startStripeCheckout } from '../lib/stripeCheckout.js'
 import { useAuth } from '../lib/useAuth'
 

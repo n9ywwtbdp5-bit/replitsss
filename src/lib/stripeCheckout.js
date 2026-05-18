@@ -1,19 +1,28 @@
-const PRICE_IDS = {
-  pro:     import.meta.env.VITE_STRIPE_PRICE_PRO_MONTHLY     || '',
-  premium: import.meta.env.VITE_STRIPE_PRICE_PREMIUM_MONTHLY || '',
-}
+import { supabase, supabaseUrl, supabaseAnonKey, isSupabaseConfigured } from './supabaseClient.js'
 
-const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL || 'https://pxagibfmciysowbfpsds.supabase.co/functions/v1/stripe-checkout'
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
+const DEFAULT_FUNCTION_URL = supabaseUrl
+  ? `${supabaseUrl.replace(/\/$/, '')}/functions/v1/stripe-checkout`
+  : ''
+const SUPABASE_FUNCTION_URL = import.meta.env.VITE_SUPABASE_FUNCTION_URL || DEFAULT_FUNCTION_URL
 
-export async function startStripeCheckout({ plan, user }) {
+export async function startStripeCheckout({ plan, billing = 'monthly', user }) {
   if (!plan || plan === 'free') {
     return { ok: false, message: 'Please choose Pro or Premium to continue.' }
   }
 
-  const priceId = PRICE_IDS[plan]
-  if (!priceId) {
-    return { ok: false, message: `No price configured for ${plan}.` }
+  if (!['monthly', 'annual'].includes(billing)) {
+    return { ok: false, message: 'Please choose monthly or annual billing.' }
+  }
+
+  if (!isSupabaseConfigured || !SUPABASE_FUNCTION_URL) {
+    return { ok: false, message: 'Payments are not configured yet. Please contact support.' }
+  }
+
+  const { data: { session } } = await supabase.auth.getSession()
+  const accessToken = session?.access_token
+
+  if (!accessToken || !user?.id) {
+    return { ok: false, message: 'Please log in before upgrading.' }
   }
 
   try {
@@ -21,16 +30,22 @@ export async function startStripeCheckout({ plan, user }) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+        apikey: supabaseAnonKey,
+        Authorization: `Bearer ${accessToken}`,
       },
       body: JSON.stringify({
-        priceId,
-        userEmail: user?.email || '',
-        userId: user?.id || '',
+        plan,
+        billing,
       }),
     })
 
-    const data = await response.json()
+    const text = await response.text()
+    let data = {}
+    try {
+      data = text ? JSON.parse(text) : {}
+    } catch {
+      data = { error: text }
+    }
 
     if (!response.ok || data.error) {
       return { ok: false, message: data.error || 'Failed to create checkout session.' }
@@ -41,7 +56,7 @@ export async function startStripeCheckout({ plan, user }) {
       return { ok: true }
     }
 
-    return { ok: false, message: 'No checkout URL returned.' }
+    return { ok: false, message: 'No checkout URL returned from server.' }
   } catch (err) {
     return { ok: false, message: err?.message || 'Checkout failed. Please try again.' }
   }

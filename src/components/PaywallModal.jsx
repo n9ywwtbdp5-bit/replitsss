@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useStore } from '../store.js'
 import { startStripeCheckout } from '../lib/stripeCheckout.js'
+import { useAuth } from '../lib/useAuth.jsx'
 
 const PLANS = [
   {
@@ -50,6 +51,7 @@ const PLANS = [
 
 export default function PaywallModal() {
   const { closePaywall, paywallFeature } = useStore()
+  const { user } = useAuth()
   const navigate = useNavigate()
   const [loadingPlan, setLoadingPlan] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
@@ -58,7 +60,7 @@ export default function PaywallModal() {
     if (loadingPlan) return
     setLoadingPlan(planId)
     setErrorMsg('')
-    const result = await startStripeCheckout({ plan: planId, billing: 'monthly' })
+    const result = await startStripeCheckout({ plan: planId, billing: 'monthly', user })
     if (!result.ok) {
       setErrorMsg(result.message)
       setLoadingPlan('')

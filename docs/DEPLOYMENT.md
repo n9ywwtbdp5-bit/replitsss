@@ -29,34 +29,24 @@ git push -u origin main
 
 ---
 
-## Step 3: Deploy to Cloudflare Pages
+## Step 3: Deploy to Vercel
 
-### A. Via Dashboard (easiest)
-1. Go to https://dash.cloudflare.com
-2. Click **Pages** → **Create a project** → **Connect to Git**
-3. Authorize GitHub and select the `studystreak` repo
-4. Configure build:
+1. Go to https://vercel.com/new
+2. Import the GitHub repository.
+3. Configure build:
    - Framework preset: **Vite**
    - Build command: `npm run build`
    - Build output directory: `dist`
-5. Click **Save and Deploy**
-6. Your app is live at `https://studystreak.pages.dev` 🎉
+4. Add the variables from `.env.example`.
+5. Click **Deploy**.
 
-### B. Set Up Auto-Deploy (GitHub Actions)
-1. Get your Cloudflare API Token:
-   - Cloudflare Dashboard → My Profile → API Tokens → Create Token
-   - Use "Edit Cloudflare Workers" template
-2. Get your Account ID from the Cloudflare dashboard sidebar
-3. In GitHub repo → Settings → Secrets → Actions, add:
-   - `CLOUDFLARE_API_TOKEN` = your token
-   - `CLOUDFLARE_ACCOUNT_ID` = your account ID
-4. Every push to `main` now auto-deploys ✅
+Every push to `main` triggers a new Vercel deployment when Git integration is connected.
 
 ---
 
 ## Step 4: Custom Domain (Optional)
 
-1. In Cloudflare Pages → your project → Custom domains
+1. In Vercel → your project → Domains
 2. Add your domain (e.g. `studystreak.app`)
 3. Follow DNS setup instructions
 4. SSL is automatic ✅
@@ -70,14 +60,16 @@ git push -u origin main
    - "StudyStreak Pro" — $8.99/month recurring
    - "StudyStreak Premium" — $12.99/month recurring
 3. Copy the Price IDs (start with `price_`)
-4. Copy `.env.example` to `.env`
-5. Add environment variables:
-   - `VITE_pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC=pk_live_xxx`
-   - `VITE_STRIPE_PRICE_PRO_MONTHLY=price_xxx`
-   - `VITE_STRIPE_PRICE_PREMIUM_MONTHLY=price_xxx`
-   - Optional annual billing IDs:
-     - `VITE_STRIPE_PRICE_PRO_ANNUAL=price_xxx`
-     - `VITE_STRIPE_PRICE_PREMIUM_ANNUAL=price_xxx`
+4. Add public Supabase variables to Vercel:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - Optional: `VITE_SUPABASE_FUNCTION_URL`
+5. Add Stripe secrets and price IDs to Supabase Edge Function secrets:
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+   - `STRIPE_PRICE_PRO_MONTHLY`
+   - `STRIPE_PRICE_PREMIUM_MONTHLY`
+   - Optional annual billing IDs: `STRIPE_PRICE_PRO_ANNUAL`, `STRIPE_PRICE_PREMIUM_ANNUAL`
 
 ---
 

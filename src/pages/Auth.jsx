@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  "https://pxagibfmciysowbfpsds.supabase.co",
-  "sb_publishable_znQXBRBmdjvc_LBHy0Bu7Q_ahSIj8iL"
-);
+import { supabase, isSupabaseConfigured } from "../lib/supabaseClient.js";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -29,6 +24,11 @@ export default function Auth() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true); setError("");
+    if (!isSupabaseConfigured) {
+      setError("Authentication is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
+      setLoading(false);
+      return;
+    }
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
@@ -44,6 +44,11 @@ export default function Auth() {
   const handleSignup = async (e) => {
     e.preventDefault();
     setLoading(true); setError("");
+    if (!isSupabaseConfigured) {
+      setError("Authentication is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
+      setLoading(false);
+      return;
+    }
     if (password !== confirmPassword) { setError("Passwords don't match."); setLoading(false); return; }
     if (password.length < 6) { setError("Password must be at least 6 characters."); setLoading(false); return; }
     const { error } = await supabase.auth.signUp({ email, password, options: { data: { username } } });
@@ -55,6 +60,11 @@ export default function Auth() {
   const handleForgot = async (e) => {
     e.preventDefault();
     setLoading(true); setError("");
+    if (!isSupabaseConfigured) {
+      setError("Authentication is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
+      setLoading(false);
+      return;
+    }
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
@@ -64,6 +74,10 @@ export default function Auth() {
   };
 
   const handleGoogle = async () => {
+    if (!isSupabaseConfigured) {
+      setError("Authentication is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
+      return;
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/app/dashboard` },

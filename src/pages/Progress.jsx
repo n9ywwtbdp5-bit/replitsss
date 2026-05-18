@@ -27,7 +27,7 @@ const MiniCard = ({ emoji, label, value, color, delay = 0 }) => (
 )
 
 export default function Progress() {
-  const { weekData, currentStreak, todayMinutes, weeklyMinutes, weeklyGoal, subjects, openPaywall, user } = useStore()
+  const { weekData, currentStreak, weeklyMinutes, subjects, openPaywall, user } = useStore()
   const [activeChart, setActiveChart] = useState('minutes')
 
   const subjectData = subjects.map((s, i) => ({

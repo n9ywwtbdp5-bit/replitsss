@@ -41,7 +41,7 @@ export default function Leaderboard() {
       name: user.name,
       avatar: user.avatar,
       weeklyXP,
-      streak: 7,
+      streak: currentStreak,
       level,
       isMe: true,
     }
@@ -50,7 +50,7 @@ export default function Leaderboard() {
       weeklyXP: Math.round(p.weeklyXP * multiplier * (0.9 + Math.random() * 0.2)),
     }))
     return [...faked, me].sort((a, b) => b.weeklyXP - a.weeklyXP)
-  }, [weeklyXP, user, level, multiplier])
+  }, [weeklyXP, user, level, currentStreak, multiplier])
 
   const myRank  = allPlayers.findIndex(p => p.isMe) + 1
   const maxXP   = allPlayers[0]?.weeklyXP || 1
@@ -149,7 +149,6 @@ export default function Leaderboard() {
             {[allPlayers[1], allPlayers[0], allPlayers[2]].map((p, col) => {
               if (!p) return null
               const rank = col === 1 ? 1 : col === 0 ? 2 : 3
-              const height = col === 1 ? 110 : 85
               return (
                 <div key={p.id} style={{
                   display: 'flex', flexDirection: 'column', alignItems: 'center',

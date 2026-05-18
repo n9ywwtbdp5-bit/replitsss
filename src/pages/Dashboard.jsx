@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useStore } from '../store.js'
+import { useAuth } from '../lib/useAuth.jsx'
 import SubjectModal from '../components/SubjectModal.jsx'
 
 const MOTIVATIONAL = [
@@ -28,10 +29,11 @@ const StatCard = ({ emoji, label, value, sub, gradient, delay = 0 }) => (
 export default function Dashboard() {
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
+  const { refreshUser } = useAuth()
   const {
-    user, currentStreak, longestStreak, xp, level, xpToNextLevel,
+    user, currentStreak, longestStreak, xp, level,
     todayMinutes, weeklyGoal, weeklyMinutes, weeklyXP,
-    subjects, activeSubjects, achievements, openPaywall, setPlan,
+    subjects, activeSubjects, achievements, openPaywall,
   } = useStore()
   const [quote]           = useState(() => MOTIVATIONAL[Math.floor(Math.random() * MOTIVATIONAL.length)])
   const [greeting, setGreeting]       = useState('')
@@ -47,15 +49,14 @@ export default function Dashboard() {
     const paymentStatus = searchParams.get('payment')
     const paidPlan      = searchParams.get('plan')
     if (paymentStatus !== 'success' || !['pro', 'premium'].includes(paidPlan)) return
-    setPlan(paidPlan)
-    setCheckoutMessage(`🎉 ${paidPlan === 'pro' ? 'Pro' : 'Premium'} activated successfully!`)
+    refreshUser?.()
+    setCheckoutMessage(`🎉 Payment received. Your ${paidPlan === 'pro' ? 'Pro' : 'Premium'} access will update shortly.`)
     const next = new URLSearchParams(searchParams)
     next.delete('payment')
     next.delete('plan')
     setSearchParams(next, { replace: true })
-  }, [searchParams, setPlan, setSearchParams])
+  }, [searchParams, refreshUser, setSearchParams])
 
-  const xpPct      = Math.min(100, Math.round((xp / xpToNextLevel) * 100))
   const weeklyPct  = Math.min(100, Math.round((weeklyMinutes / weeklyGoal) * 100))
   const unlockedAchievements = achievements.filter(a => a.unlocked)
 

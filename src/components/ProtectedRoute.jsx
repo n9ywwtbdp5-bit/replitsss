@@ -28,7 +28,7 @@ export default function ProtectedRoute({ children }) {
             borderRadius: '50%',
             animation: 'spin 0.7s linear infinite',
           }} />
-          <style>{'@keyframes spin { to { transform: rotate(360deg); } }'}</style>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       </div>
     )

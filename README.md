@@ -37,8 +37,9 @@ Open `http://localhost:5173` in your browser.
 | Routing | React Router v6 |
 | State | Zustand (persisted) |
 | Charts | Recharts |
-| Deployment | Cloudflare Pages |
-| Payments | Stripe (integrate separately) |
+| Deployment | Vercel |
+| Auth/Data | Supabase |
+| Payments | Stripe Checkout + Supabase Edge Functions |
 
 ## 📁 Project Structure
 
@@ -64,43 +65,28 @@ studystreak/
 │   └── index.css           # Design system
 ├── index.html
 ├── vite.config.js
-├── wrangler.toml           # Cloudflare config
 └── package.json
 ```
 
-## ☁️ Deploy to Cloudflare Pages
+## ☁️ Deploy to Vercel
 
-### Option A: GitHub Integration (Recommended)
-
-1. Push this repo to GitHub
-2. Go to [Cloudflare Dashboard](https://dash.cloudflare.com) → Pages → Create a project
-3. Connect your GitHub account and select this repository
-4. Set build settings:
+1. Push this repo to GitHub.
+2. Import the project in Vercel.
+3. Set build settings:
+   - **Framework preset:** Vite
    - **Build command:** `npm run build`
    - **Build output directory:** `dist`
-5. Click **Save and Deploy** ✅
+4. Add the variables from `.env.example` in Vercel and Supabase Edge Function secrets.
 
 Every push to `main` auto-deploys. 🎉
 
-### Option B: Wrangler CLI
+## 💳 Stripe + Supabase Setup
 
-```bash
-npm install -g wrangler
-wrangler login
-npm run build
-wrangler pages deploy dist --project-name=studystreak
-```
-
-## 💳 Adding Stripe Payments
-
-1. Create a [Stripe account](https://stripe.com)
-2. Create two products: Pro ($8.99/mo) and Premium ($12.99/mo)
-3. Copy `.env.example` to `.env` and set:
-   - `VITE_pk_live_51TXg47HU1AxqRSaJZ5Btv3S7cw6JWk1np8AkqIKJC5yuyIdYqium68kdyu6baNSmZqA5DtfkAvby3naYJJSxkXmD00d8XPnmCC`
-   - `VITE_STRIPE_PRICE_PRO_MONTHLY`
-   - `VITE_STRIPE_PRICE_PREMIUM_MONTHLY`
-   - Optional annual IDs: `VITE_STRIPE_PRICE_PRO_ANNUAL`, `VITE_STRIPE_PRICE_PREMIUM_ANNUAL`
-4. Checkout is handled in `src/lib/stripeCheckout.js` and used by both `src/pages/Pricing.jsx` and `src/components/PaywallModal.jsx`
+1. Create Stripe products/prices for Pro and Premium monthly plans, plus optional annual plans.
+2. Add `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and optional `VITE_SUPABASE_FUNCTION_URL` to Vercel.
+3. Add Stripe secrets and price IDs to Supabase Edge Function secrets.
+4. Apply the Supabase migration, then deploy `stripe-checkout` and `stripe-webhook`.
+5. Configure the Stripe webhook endpoint to call your `stripe-webhook` function for checkout/session and subscription events.
 
 ## 🎨 Design System
 
